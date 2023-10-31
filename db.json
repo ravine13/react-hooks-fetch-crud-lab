@@ -20,7 +20,7 @@
         "props",
         "state"
       ],
-      "correctIndex": 1
+      "correctIndex": "2"
     },
     {
       "id": 3,
@@ -65,17 +65,6 @@
         "controlled"
       ],
       "correctIndex": 1
-    },
-    {
-      "prompt": "hello",
-      "answers": [
-        "hii",
-        "yes",
-        "yoh",
-        "mmmhhhmmm"
-      ],
-      "correctIndex": "4",
-      "id": 7
     }
   ]
 }

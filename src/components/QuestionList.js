@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DeleteQuestion from './DeleteQuestion';
 
 function QuestionList() {
   const [questions, setQuestions] = useState([]);
@@ -15,6 +16,20 @@ function QuestionList() {
         setQuestions(data);
       });
   }, []);
+
+  const handleDeleteQuestion = (id) => {
+    fetch(`http://localhost:4000/questions/${id}`, {
+      method: 'DELETE',
+    })
+      .then(() => {
+        setQuestions((prevQuestions) =>
+          prevQuestions.filter((question) => question.id !== id)
+        );
+      })
+      .catch((error) => {
+        console.error('Error deleting the question:', error);
+      });
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -62,12 +77,7 @@ function QuestionList() {
       });
   };
 
-  const handleViewQuestions = () => {
-    setShowQuestions(true);
-  };
-
   const handleUpdateCorrectAnswer = (id, newCorrectIndex) => {
-    // Send a PATCH request to the server to update the correct answer
     fetch(`http://localhost:4000/questions/${id}`, {
       method: "PATCH",
       headers: {
@@ -76,44 +86,37 @@ function QuestionList() {
       body: JSON.stringify({ correctIndex: newCorrectIndex }),
     })
       .then(() => {
-        // Update the client state by finding the question by id and updating the correctIndex
         setQuestions((prevQuestions) =>
           prevQuestions.map((question) =>
             question.id === id ? { ...question, correctIndex: newCorrectIndex } : question
           )
         );
       })
-      .catch((error) => {
-        console.error("Error updating the correct answer:", error);
-      });
   };
-
-  const [showQuestions, setShowQuestions] = useState(false);
 
   return (
     <section>
       <h1>Quiz Questions</h1>
-      {showQuestions && (
-        <ul>
-          {questions.map((question) => (
-            <li key={question.id}>
-              {question.prompt}
-              <select
-                value={question.correctIndex}
-                onChange={(e) => handleUpdateCorrectAnswer(question.id, e.target.value)}
-              >
-                {question.answers.map((answer, index) => (
-                  <option key={index} value={index}>
-                    {answer}
-                  </option>
-                ))}
-              </select>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul>
+        {questions.map((question) => (
+          <li key={question.id}>
+            {question.prompt}
+            <select
+              value={question.correctIndex}
+              onChange={(e) => handleUpdateCorrectAnswer(question.id, e.target.value)}
+            >
+              {question.answers.map((answer, index) => (
+                <option key={index} value={index}>
+                  {answer}
+                </option>
+              ))}
+            </select>
+            <DeleteQuestion onDelete={handleDeleteQuestion} questionId={question.id} />
+          </li>
+        ))}
+      </ul>
       <h2>Create a New Question</h2>
-      <form>
+      <form onSubmit={handleNewQuestionSubmit}>
         <div>
           <label htmlFor="prompt">Prompt:</label>
           <input
@@ -149,12 +152,7 @@ function QuestionList() {
             onChange={handleInputChange}
           />
         </div>
-        <button type="button" onClick={handleNewQuestionSubmit}>
-          Create Question
-        </button>
-        <button type="button" onClick={handleViewQuestions}>
-          View Questions
-        </button>
+        <button type="submit">Create Question</button>
       </form>
     </section>
   );
