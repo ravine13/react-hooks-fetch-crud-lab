@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DeleteQuestion from './DeleteQuestion';
+import handleUpdateCorrectAnswer from './update'; 
 
 function QuestionList() {
   const [questions, setQuestions] = useState([]);
@@ -77,23 +78,6 @@ function QuestionList() {
       });
   };
 
-  const handleUpdateCorrectAnswer = (id, newCorrectIndex) => {
-    fetch(`http://localhost:4000/questions/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ correctIndex: newCorrectIndex }),
-    })
-      .then(() => {
-        setQuestions((prevQuestions) =>
-          prevQuestions.map((question) =>
-            question.id === id ? { ...question, correctIndex: newCorrectIndex } : question
-          )
-        );
-      })
-  };
-
   return (
     <section>
       <h1>Quiz Questions</h1>
@@ -103,7 +87,7 @@ function QuestionList() {
             {question.prompt}
             <select
               value={question.correctIndex}
-              onChange={(e) => handleUpdateCorrectAnswer(question.id, e.target.value)}
+              onChange={(e) => handleUpdateCorrectAnswer(question.id, e.target.value)} // Use handleUpdateCorrectAnswer
             >
               {question.answers.map((answer, index) => (
                 <option key={index} value={index}>
